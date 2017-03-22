@@ -1,0 +1,44 @@
+body {
+	font-family: Arial, Helvetica, sans-serif
+}
+
+table, th, td {
+    border: 0px solid black;
+    padding: 2px;
+    border-collapse:collapse;    
+	page-break-inside: avoid !important;
+}
+
+.chordlabel {
+	font-style: italic;
+	text-align: center;
+}
+
+.title {
+	font-weight:bold;
+}
+
+.chords {
+	font-weight:bold;
+}
+
+.lyrics {
+	padding-bottom: 12px;
+}
+
+.chordimage {
+	width : 64px;
+	height: 96px;
+}
+
+.chordlabel {
+	font-style: italic;
+	text-align: center;
+	border: 2px solid black;
+    border-collapse:separate;    
+}
+
+.chordtable {
+	border: 2px solid black;
+    border-collapse:collapse;
+}
