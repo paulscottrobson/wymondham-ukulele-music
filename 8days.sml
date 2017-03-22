@@ -19,11 +19,14 @@ Author := Lennon and McCartney
 {Verse 2:} Ooh I need your [D7///]love babe, [F///] Guess you know it's [C///]true.
 [C///]Hope you need my [D7///]love babe, [F///]Just like I need [C///]you.
 
+
 {Verse 3:} Ooh I need your [D7///]love babe, [F///] Guess you know it's [C///]true.
 [C///]Hope you need my [D7///]love babe, [F///]Just like I need [C///]you.
 
 {Verse 4:} Ooh I need your [D7///]love babe, [F///] Guess you know it's [C///]true.
 [C///]Hope you need my [D7///]love babe, [F///]Just like I need [C///]you.
+
+[break]
 
 {Verse 5:} Ooh I need your [D7///]love babe, [F///] Guess you know it's [C///]true.
 [C///]Hope you need my [D7///]love babe, [F///]Just like I need [C///]you.

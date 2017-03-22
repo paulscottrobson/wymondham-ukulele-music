@@ -4,7 +4,7 @@
 #
 # ****************************************************************************************
 
-import re,sys
+import re,sys,time
 
 #
 #	Represents a single line consisting of a title, and chord and text that goes with it.
@@ -56,6 +56,12 @@ class SongBlock:
 		# Linesin this block.
 		self.lines = [Line()]
 		self.count = 0
+		self.pageBreak = False
+	#
+	#	Page break after t his
+	#
+	def setPageBreak(self):
+		self.pageBreak = True
 	#
 	#	Add a line part to the songblock current line
 	#
@@ -75,7 +81,11 @@ class SongBlock:
 			handle.write('<table>\n')
 			for line in self.lines:
 				line.render(handle)
-			handle.write('</table><br />\n')
+			handle.write('</table>\n')
+		if self.pageBreak:
+			handle.write('<div class="break"></div>\n')
+		else:
+			handle.write("<br />\n")
 #
 #	Main conversion class
 #
@@ -113,6 +123,9 @@ class SMLConvert:
 		pendingTitle = ""
 		# For each line
 		for src in self.source:
+			if src.lower() == "[break]":
+				self.blocks[-1].setPageBreak()
+				src = ""
 			# Check for {} header markers
 			m = re.match("\\{(.*)\\}\\s*(.*)$",src)
 			if m is not None:
@@ -174,8 +187,6 @@ class SMLConvert:
 		handle.write("</tr><tr>\n")
 		for c in chords:
 			cn = c.lower().replace("#","sharp")
-			if len(cn) > 1 and cn[-1] == "b":
-				cn = cn[:-1]+"flat"
 			handle.write("<td class='chordtable'><img class = 'chordimage' src='images/{0}.png'></td>".format(c))
 		handle.write("</tr></table><br />\n")
 
@@ -191,14 +202,15 @@ class SMLConvert:
 		handle.write("</td></tr></table>\n")
 		for block in self.blocks:
 			block.render(handle)
-
+		date = time.strftime("%d-%m-%Y")
+		handle.write("<p style='float:right'>Wymondham Ukulele Group {0}</p>".format(date))
 
 if __name__ == '__main__':
 
 	cv = SMLConvert()
 	cv.read("8days.sml")
 	cv.process()
-	handle = open("test.html","w")
+	handle = open("target/test.html","w")
 	handle.write('<link rel="stylesheet" href="sml.css">\n')
 	cv.renderSheet(handle)
 	handle.close()
