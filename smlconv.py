@@ -1,6 +1,9 @@
+# ****************************************************************************************
 #
-#	SML to HTML Conversion
+#									SML to HTML Conversion
 #
+# ****************************************************************************************
+
 import re,sys
 
 #
@@ -12,13 +15,17 @@ class Line:
 		self.title = ""
 		self.chords = []
 		self.lyrics = []
-
+	#
+	#	Add a new chord/lyric and possibly title to this line.
+	#
 	def add(self,title,chords,lyrics):
 		if title != "":
 			self.title = title 
 		self.chords.append(chords)
 		self.lyrics.append(lyrics)
-
+	#
+	#	Render the line in HTML
+	#
 	def render(self,handle):
 		if len(self.chords) > 0:
 			handle.write('<table>\n')
@@ -29,14 +36,17 @@ class Line:
 			handle.write("".join(["<td class='lyrics'>{0}</td>".format(x) for x in self.lyrics]))
 			handle.write("</tr>\n")
 			handle.write("</table>\n")
-
+	#
+	#	Pad out chord defs with spaces e.g G/C/ become "G / C /"
+	#
 	def chordProcess(self,chord):
 		chord = chord.replace("/"," / ").replace("."," . ")
 		while chord.find("  ") >= 0:
 			chord = chord.replace("  "," ")
 		return chord.strip()
 #
-#	Represents a collection of lines
+#	Represents a collection of lines which should all be on the same page
+#	issues in wkhtmltopdf?
 #
 class SongBlock:
 	#
@@ -82,7 +92,6 @@ class SMLConvert:
 		self.blocks = [SongBlock()]
 		# Known chords displayed
 		self.chords = {}
-		self.chords = {"A":"","B":"","C":"","D":"","E":"","F":"","G":"","Bb":"" }
 	#
 	#	Read and preprocess the source file
 	#
@@ -126,25 +135,48 @@ class SMLConvert:
 
 				# chord group.
 				if (src+" ")[0] == '[':
+					# when followed by another group
 					m = re.match("^\\[(.*?)\\]\\s*(.*?)(\\[.*)$",src)
 					if m is None:
+						# when not followed by another group
 						m = re.match("^\\[(.*?)\\]\\s*(.*)(.*)$",src)
 					assert m is not None,"Error "+src
+					# find chords in chord definition
+					self.findChords(m.group(1))
+					# add it to current block
 					self.blocks[-1].add(pendingTitle,m.group(1).strip(),m.group(2).strip())
 					pendingTitle = ""
+					# discard
 					src = m.group(3).strip()
+			# mark end of line
 			self.blocks[-1].endLine()
+	#
+	#	Extract actual chords fom the chord text (can have other things)
+	#
+	def findChords(self,chords):
+		for c in chords.lower().replace("."," ").replace("/"," ").split(" "):
+			if re.match("^[a-g][579\\#\\bdim]*$",c):
+				self.chords[c] = True
 
+
+	#
+	#	Render the chord display
+	#
 	def renderChords(self,handle):
+		# get and sort known chords
 		chords = [x for x in self.chords.keys()]
 		chords.sort()
+		# render in HTML
 		handle.write("<table><tr>\n")
 		for c in chords:
-			handle.write("<td class = 'chordlabel'>{0}</td>".format(c))
+			cf = c[0].upper()+c[1:].lower()
+			handle.write("<td class = 'chordlabel'>{0}</td>".format(cf))
 		handle.write("</tr><tr>\n")
 		for c in chords:
-			c = "chord"
-			handle.write("<td class='chordtable'><img class = 'chordimage' src='{0}.png'></td>".format(c))
+			cn = c.lower().replace("#","sharp")
+			if len(cn) > 1 and cn[-1] == "b":
+				cn = cn[:-1]+"flat"
+			handle.write("<td class='chordtable'><img class = 'chordimage' src='images/{0}.png'></td>".format(c))
 		handle.write("</tr></table><br />\n")
 
 	#
@@ -171,6 +203,4 @@ if __name__ == '__main__':
 	cv.renderSheet(handle)
 	handle.close()
 
-# rip chord names from song 
-# generate chord images
 
