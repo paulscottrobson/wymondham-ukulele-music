@@ -1,3 +1,6 @@
+#
+#	Generate chord images, requires Pillow.
+#
 from PIL import Image,ImageDraw,ImageFont
 
 def xPos(n):
@@ -28,18 +31,17 @@ def create(tgtFile,fretting):
 	image.save(tgtFile)
 
 if __name__ == '__main__':
+	# add chords here, any old how will do as long as there's spacing.
 	chords = """
-		am:2000 
-		d7:2223 
-		c:0003 
-		g:0232
-		g7:0212
+		c:0003 c7:0002 c6:0001
+		d:2220 d7:2223 dm:2210
 		f:2010
-		a:2100
+		g:0232	g7:0212
+		a:2100 am:2000 a7:0100
 	"""
 
 	chords = chords.replace("\t"," ").replace("\n"," ").split(" ")
 	for c in chords:
 		if c != "":
 			c = c.split(":")
-			create("images/"+c[0]+".png",c[1])
+			create("target/images/"+c[0]+".png",c[1])

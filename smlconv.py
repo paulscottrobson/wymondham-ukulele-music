@@ -4,7 +4,7 @@
 #
 # ****************************************************************************************
 
-import re,sys,time
+import re,sys,time,os
 
 #
 #	Represents a single line consisting of a title, and chord and text that goes with it.
@@ -205,14 +205,33 @@ class SMLConvert:
 		date = time.strftime("%d-%m-%Y")
 		handle.write("<p style='float:right'>Wymondham Ukulele Group {0}</p>".format(date))
 
+	#
+	#	Compile a file and copy it to the target
+	#
+	def compileFile(self,sourceFile):
+		self.reset()
+		self.read(sourceFile)
+		self.process()
+		target = sourceFile if sourceFile.find(os.sep) < 0 else sourceFile[sourceFile.rfind(os.sep)+1:]
+		target = "target"+os.sep+target[:target.rfind(".")]+".html"
+		handle = open(target,"w")
+		self.HTMLheader(handle)
+		self.renderSheet(handle)
+		self.HTMLfooter(handle)
+		handle.close()
+
+	def HTMLheader(self,handle):
+		handle.write('<html>\n')
+		handle.write('<head>\n')
+		handle.write('<link rel="stylesheet" href="sml.css">\n')
+		handle.write('</head>\n')
+		handle.write('<body>\n')
+
+	def HTMLfooter(self,handle):
+		handle.write('</body>\n')
+		handle.write('</html>\n')
+
 if __name__ == '__main__':
-
 	cv = SMLConvert()
-	cv.read("8days.sml")
-	cv.process()
-	handle = open("target/test.html","w")
-	handle.write('<link rel="stylesheet" href="sml.css">\n')
-	cv.renderSheet(handle)
-	handle.close()
-
+	cv.compileFile("./8days.sml")
 
